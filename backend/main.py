@@ -105,13 +105,39 @@ ensure_db_schema()
 
 app = FastAPI(title="ProofHire AI API")
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+cors_origins_env = os.getenv("ALLOWED_ORIGINS") or os.getenv("FRONTEND_URL")
+
+if cors_origins_env and cors_origins_env.strip() == "*":
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=False,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+else:
+    allowed_origins = [
+        "http://localhost:5173",
+        "http://localhost:3000",
+        "http://127.0.0.1:5173",
+        "http://localhost:8000",
+        "http://127.0.0.1:8000",
+        "https://proofhire-ai.onrender.com",
+    ]
+    if cors_origins_env:
+        for origin in cors_origins_env.split(","):
+            cleaned = origin.strip()
+            if cleaned and cleaned not in allowed_origins:
+                allowed_origins.append(cleaned)
+
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=allowed_origins,
+        allow_origin_regex=r"https://.*\.vercel\.app",
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
 os.makedirs("uploads", exist_ok=True)
 
