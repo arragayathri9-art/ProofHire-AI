@@ -8,7 +8,14 @@ def with_gemini_retry(request_name: str):
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
-            models = ["gemini-3.8-flash", "gemini-3.5-flash", "gemini-3.7-flash", "gemini-3.6-flash"]
+            models = [
+                "gemini-flash-lite-latest",
+                "gemini-3.1-flash-lite",
+                "gemini-3.5-flash-lite",
+                "gemini-3.8-flash",
+                "gemini-3.5-flash",
+                "gemini-3.7-flash"
+            ]
             
             print(f"{request_name}:")
             last_error = ""
